@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongo
+        image: 891376963426.dkr.ecr.us-east-1.amazonaws.com/mongo:v0.1
+        ports:
+        - containerPort: 27017
+          #volumeMounts: 
+          #- name: mongo-pvc
+          #  mountPath: /data/db
+        livenessProbe:
+          httpGet:
+            path: /test
+            port: 27017
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /test
+            port: 27017
+          initialDelaySeconds: 20
+          periodSeconds: 10
+
+      #volumes:
+            #- name: mongo-pvc
+            #  persistentVolumeClaim:
+            #    claimName: mongo-pvc
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+

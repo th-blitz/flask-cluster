@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: flask-replication-policy
+spec:
+  replicas: 1
+  selector:
+    app: flask-app
+  template:
+    metadata:
+      name: flask-app
+      labels:
+        app: flask-app
+    spec:
+      containers:
+      - name: flask-app
+        image: 891376963426.dkr.ecr.us-east-1.amazonaws.com/flask-app:v0.1
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGO_HOST
+          value: mongodb-service
+        - name: MONGO_PORT
+          value: "27017"
+        - name: FLASK_ENV
+          value: "development"
+
+
